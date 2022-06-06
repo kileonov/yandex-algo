@@ -1,0 +1,7 @@
+rootProject.name = "yandex"
+
+include ':sprint1', 'sprint2', 'sprint3', 'util'
+include 'qwe'
+include 'qwe'
+include 'sprint4'
+
