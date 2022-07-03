@@ -1,34 +1,19 @@
 package e;
 
 public class Solution {
-
     public static boolean treeSolution(Node head) {
-        if (head == null) {
-            return true;
-        } else if (head.left != null && head.right != null) {
-            return  compareTo(head.value, head.left.value, true) &&
-                    compareTo(head.value, head.right.value, false) &&
-                    treeSolution(head.left) &&
-                    treeSolution(head.right);
-        } else if (head.left != null && head.right == null) {
-            return  compareTo(head.value, head.left.value, true) &&
-                    treeSolution(head.left);
-        } else if (head.left == null && head.right != null) {
-            return  compareTo(head.value, head.right.value, false) &&
-                    treeSolution(head.right);
-        } else {
-            return true;
-        }
+        return isBST(head, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
-    private static boolean compareTo(int headValue, int value, boolean isLeft) {
-        if (isLeft) {
-            return headValue > value;
-        } else {
-            return value > headValue;
-        }
+    public static boolean isBST(Node head, int minVal, int maxVal) {
+        if (head == null) return true;
+
+        if (head.value <= minVal || head.value >= maxVal) return false;
+
+        return isBST(head.left, minVal, head.value) && isBST(head.right, head.value, maxVal);
     }
 
+    //    Comment it before submitting
     private static class Node {
         int value;
         Node left;
@@ -47,24 +32,29 @@ public class Solution {
         }
     }
 
+    /*
+            5
+           / \
+          3   8
+         / \
+        1   4 <- node2
+     */
+
     private static void test() {
-
-
         Node node1 = new Node(1, null, null);
         Node node2 = new Node(4, null, null);
         Node node3 = new Node(3, node1, node2);
         Node node4 = new Node(8, null, null);
         Node node5 = new Node(5, node3, node4);
-        boolean sol1 = treeSolution(node5);
-        System.out.println("sol1 = " + sol1);
-        assert sol1;
+        assert treeSolution(node5);
+        System.out.println("treeSolution(node5) = " + treeSolution(node5));
         node2.value = 5;
-        boolean sol2 = !treeSolution(node5);
-        System.out.println("sol2 = " + sol2);
-        assert sol2;
+        System.out.println("treeSolution(node5) = " + treeSolution(node5));
+        assert !treeSolution(node5);
     }
 
     public static void main(String[] args) {
         test();
     }
 }
+
