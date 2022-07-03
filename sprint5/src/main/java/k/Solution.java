@@ -5,14 +5,24 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 public class Solution {
+
     public static void printRange(Node root, int L, int R, BufferedWriter writer) throws IOException {
-        if (root.getValue() >= L && root.getLeft() != null) printRange(root.getLeft(), L, R, writer);
+        if (root == null) return;
 
-        if (root.getValue() >= L && root.getValue() <= R) writer.append(Integer.toString(root.getValue())).append(System.lineSeparator());
+        if (root.getLeft() != null && root.getValue() >= L) {
+            printRange(root.getLeft(), L, R, writer);
+        }
 
-        if (root.getValue() <= R && root.getRight() != null) printRange(root.getRight(), L, R, writer);
+        if (root.getValue() >= L && root.getValue() <= R) {
+            writer.append(Integer.toString(root.getValue())).append(' ');
+        }
+
+        if (root.getRight() != null && root.getValue() <= R) {
+            printRange(root.getRight(), L, R, writer);
+        }
     }
 
+    //    /** Comment it before submitting
     private static class Node {
         private int value;
         private Node left;
@@ -49,26 +59,31 @@ public class Solution {
         }
     }
 
-    private static void test() throws IOException {
-        Node node5 = new Node(null, null, 15);
-        Node node4 = new Node(null, node5, 11);
-        Node node3 = new Node(null, null, 1);
-        Node node2 = new Node(node3, null, 3);
-        Node node1 = new Node(node2, node4, 7);
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
-        printRange(node1, 6, 14, writer);
-        writer.flush();
+    /*
+           5
+         /    \
+        1     10
+         \    /
+          2  9
+            /
+           8
+            \
+             8
 
-//        Node node1 = new Node(null, null, 2);
-//        Node node2 = new Node(null, node1, 1);
-//        Node node3 = new Node(null, null, 8);
-//        Node node4 = new Node(null, node3, 8);
-//        Node node5 = new Node(node4, null, 9);
-//        Node node6 = new Node(node5, null, 10);
-//        Node node7 = new Node(node2, node6, 5);
-//        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
-//        printRange(node7, 2, 8, writer);
-//        writer.flush();
+     [2, 8]
+     */
+
+    private static void test() throws IOException {
+        Node node1 = new Node(null, null, 2);
+        Node node2 = new Node(null, node1, 1);
+        Node node3 = new Node(null, null, 8);
+        Node node4 = new Node(null, node3, 8);
+        Node node5 = new Node(node4, null, 9);
+        Node node6 = new Node(node5, null, 10);
+        Node node7 = new Node(node2, node6, 5);
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
+        printRange(node7, 2, 8, writer);
+        writer.flush();
         // expected output: 2 5 8 8
     }
 
