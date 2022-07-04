@@ -4,12 +4,18 @@ public class Solution {
     public static Node insert(Node root, int key) {
         if (root == null) return null;
 
-        if (key < root.getValue()) {
-            if (root.getLeft() != null) insert(root.getLeft(), key);
-            else root.setLeft(new Node(null, null, key));
+        if (root.getValue() > key) {
+            if (root.getLeft() == null) {
+                root.setLeft(new Node(null, null, key));
+            } else {
+                insert(root.getLeft(), key);
+            }
         } else {
-            if (root.getRight() != null) insert(root.getRight(), key);
-            else root.setRight(new Node(null, null, key));
+            if (root.getRight() == null) {
+                root.setRight(new Node(null, null, key));
+            } else {
+                insert(root.getRight(), key);
+            }
         }
 
         return root;
@@ -61,27 +67,13 @@ public class Solution {
         }
     }
 
-    /*
-
-        7
-         \
-          8
-         /
-        7
-
-     */
-
     private static void test() {
         Node node1 = new Node(null, null, 7);
         Node node2 = new Node(node1, null, 8);
         Node node3 = new Node(null, node2, 7);
         Node newHead = insert(node3, 6);
-
         System.out.println("newHead = " + newHead);
-        System.out.println("node3 = " + node3);
-
         System.out.println("newHead.getLeft().getValue() = " + newHead.getLeft().getValue());
-
 //        assert newHead == node3;
 //        assert newHead.getLeft().getValue() == 6;
     }
