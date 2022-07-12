@@ -3,97 +3,96 @@ package exam;
 public class Solution {
 
     public static Node remove(Node root, int key) {
-        Relation deleteRelation = findDeleteElWithParent(null, root, key);
-        if (deleteRelation.current == null) return root;
+        Relation deleteRelation = findDeleteElWithParent(null, root, key, true);
+        if (deleteRelation.child == null) return root;
 
-        if (deleteRelation.current.getLeft() == null && deleteRelation.current.getRight() == null) {
-            if (deleteRelation.parent == null) return null;
-
-            if (deleteRelation.parent.getLeft() == deleteRelation.current) {
+        if (deleteRelation.child.getLeft() == null && deleteRelation.child.getRight() == null) {
+            if (deleteRelation.parent == null) {
+                root = null;
+            } else if (deleteRelation.isLeft) {
                 deleteRelation.parent.setLeft(null);
             } else {
                 deleteRelation.parent.setRight(null);
             }
-            return root;
-        }
-
-        // parent null|notnull
-        // current notnull
-        Relation replaceRelation = findReplacedElWithParent(null, deleteRelation.current.getRight());
-        if (replaceRelation.parent != null) {
-            replaceRelation.parent.setLeft(null);
-        }
-        if (replaceRelation.current == null) {
-            if (deleteRelation.parent != null) {
-                if (deleteRelation.parent.getLeft() == deleteRelation.current) {
-                    deleteRelation.parent.setLeft(deleteRelation.current.getLeft());
-                } else {
-                    deleteRelation.parent.setRight(deleteRelation.current.getLeft());
-                }
+        } else if (deleteRelation.child.getLeft() == null) {
+            if (deleteRelation.child == root) {
+                root = deleteRelation.child.getRight();
+            } else if (deleteRelation.isLeft) {
+                deleteRelation.parent.setLeft(deleteRelation.child.getRight());
             } else {
-                Node temp = deleteRelation.current.getLeft();
-                deleteRelation.current.setLeft(null);
-                return temp;
+                deleteRelation.parent.setRight(deleteRelation.child.getRight());
+            }
+        } else if (deleteRelation.child.getRight() == null) {
+            if (deleteRelation.child == root) {
+                root = deleteRelation.child.getLeft();
+            } else if (deleteRelation.isLeft) {
+                deleteRelation.parent.setLeft(deleteRelation.child.getLeft());
+            } else {
+                deleteRelation.parent.setRight(deleteRelation.child.getLeft());
             }
         } else {
-            Node temp = replaceRelation.current.getRight();
-            if (deleteRelation.parent != null) {
-                if (deleteRelation.parent.getLeft() == deleteRelation.current) {
-                    deleteRelation.parent.setLeft(replaceRelation.current);
-                } else {
-                    deleteRelation.parent.setRight(replaceRelation.current);
-                }
-                replaceRelation.current.setLeft(deleteRelation.current.getLeft());
-                replaceRelation.current.setRight(null);
-            } else {
-                if (replaceRelation.current != deleteRelation.current.getLeft()) {
-                    replaceRelation.current.setLeft(deleteRelation.current.getLeft());
-                }
-                if (replaceRelation.current != deleteRelation.current.getRight()) {
-                    replaceRelation.current.setRight(deleteRelation.current.getRight());
-                }
+            Relation replaceRelation = findReplacedElWithParent(deleteRelation.child, deleteRelation.child.getRight());
+            if (replaceRelation.parent != deleteRelation.child) {
+                replaceRelation.parent.setLeft(replaceRelation.child.getRight());
+                replaceRelation.child.setRight(null);
             }
-            if (temp != null && replaceRelation.parent != null) {
-                replaceRelation.parent.setLeft(temp);
-            }
-        }
-        deleteRelation.current.setLeft(null);
-        deleteRelation.current.setRight(null);
 
-        if (deleteRelation.parent == null) {
-            return replaceRelation.current;
+            if (deleteRelation.child == root) {
+                root = replaceRelation.child;
+            } else if (deleteRelation.isLeft) {
+                deleteRelation.parent.setLeft(replaceRelation.child);
+            } else {
+                deleteRelation.parent.setRight(replaceRelation.child);
+            }
+
+            if (replaceRelation.child != deleteRelation.child.getLeft()) {
+                replaceRelation.child.setLeft(deleteRelation.child.getLeft());
+            }
+            if (replaceRelation.child != deleteRelation.child.getRight()) {
+                replaceRelation.child.setRight(deleteRelation.child.getRight());
+            }
+
+            deleteRelation.child.setLeft(null);
+            deleteRelation.child.setRight(null);
         }
 
         return root;
     }
 
-    public static Relation findDeleteElWithParent(Node parent, Node current, int key) {
-        if (current == null) return new Relation(parent, null);
+    public static Relation findDeleteElWithParent(Node parent, Node child, int key, boolean isLeft) {
+        if (child == null) return new Relation(parent, null, isLeft);
 
-        if (current.getValue() == key) {
-            return new Relation(parent, current);
-        } else if (current.getValue() > key) {
-            return findDeleteElWithParent(current, current.getLeft(), key);
+        if (child.getValue() == key) {
+            return new Relation(parent, child, isLeft);
+        } else if (child.getValue() > key) {
+            return findDeleteElWithParent(child, child.getLeft(), key, true);
         } else {
-            return findDeleteElWithParent(current, current.getRight(), key);
+            return findDeleteElWithParent(child, child.getRight(), key, false);
         }
     }
 
-    public static Relation findReplacedElWithParent(Node parent, Node current) {
-        if (current == null) return new Relation(parent, null);
+    public static Relation findReplacedElWithParent(Node parent, Node child) {
+        if (child == null) return new Relation(parent, null);
 
-        if (current.getLeft() == null) return new Relation(parent, current);
+        if (child.getLeft() == null) return new Relation(parent, child);
 
-        return findReplacedElWithParent(current, current.getLeft());
+        return findReplacedElWithParent(child, child.getLeft());
     }
 
     private static class Relation {
         private Node parent;
-        private Node current;
+        private Node child;
+        private boolean isLeft;
 
-        public Relation(Node parent, Node current) {
+        public Relation(Node parent, Node child) {
             this.parent = parent;
-            this.current = current;
+            this.child = child;
+        }
+
+        public Relation(Node parent, Node child, boolean isLeft) {
+            this.parent = parent;
+            this.child = child;
+            this.isLeft = isLeft;
         }
     }
 
@@ -182,23 +181,23 @@ public class Solution {
 //        Node node7 = new Node(node3, node6, 5);
 //        Node newHead = remove(node7, 10);
 
-//        Node node1 = new Node(null, null, 1);
-//        Node node2 = new Node(null, null, 3);
-//        Node node3 = new Node(node1, node2, 2);
-//        Node node4 = new Node(null, null, 5);
-//        Node node5 = new Node(null, null, 7);
-//        Node node6 = new Node(node4, node5, 6);
-//        Node node7 = new Node(node3, node6, 4);
-//        Node newHead = remove(node7, 4);
+        Node node1 = new Node(null, null, 1);
+        Node node2 = new Node(null, null, 3);
+        Node node3 = new Node(node1, node2, 2);
+        Node node4 = new Node(null, null, 5);
+        Node node5 = new Node(null, null, 7);
+        Node node6 = new Node(node4, node5, 6);
+        Node node7 = new Node(node3, node6, 4);
+        Node newHead = remove(node7, 4);
 
 //        Node node1 = new Node(null, null, 7);
 //        Node node2 = new Node(null, node1, 5);
 //        Node node3 = new Node(node2, null, 10);
-//        remove(node3, 10);
+//        Node remove = remove(node3, 10);
 
-        Node node1 = new Node(null, null, 2);
-        Node node2 = new Node(null, node1, 1);
-        remove(node2, 1);
+//        Node node1 = new Node(null, null, 2);
+//        Node node2 = new Node(null, node1, 1);
+//        Node remove = remove(node2, 1);
     }
 
     public static void main(String[] args) {
