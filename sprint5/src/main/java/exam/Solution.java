@@ -3,7 +3,7 @@ package exam;
 public class Solution {
 
     public static Node remove(Node root, int key) {
-        Relation deleteRelation = findDeleteElWithParent(null, root, key, true);
+        final Relation deleteRelation = findDeleteElWithParent(null, root, key, true);
         if (deleteRelation.child == null) return root;
 
         if (deleteRelation.child.getLeft() == null && deleteRelation.child.getRight() == null) {
@@ -31,7 +31,7 @@ public class Solution {
                 deleteRelation.parent.setRight(deleteRelation.child.getLeft());
             }
         } else {
-            Relation replaceRelation = findReplacedElWithParent(deleteRelation.child, deleteRelation.child.getRight());
+            final Relation replaceRelation = findReplacedElWithParent(deleteRelation.child, deleteRelation.child.getRight());
             if (replaceRelation.parent != deleteRelation.child) {
                 replaceRelation.parent.setLeft(replaceRelation.child.getRight());
                 replaceRelation.child.setRight(null);
@@ -80,8 +80,8 @@ public class Solution {
     }
 
     private static class Relation {
-        private Node parent;
-        private Node child;
+        private final Node parent;
+        private final Node child;
         private boolean isLeft;
 
         public Relation(Node parent, Node child) {
@@ -130,77 +130,5 @@ public class Solution {
         public void setValue(int value) {
             this.value = value;
         }
-
-        @Override
-        public String toString() {
-            return "Node{" +
-                    "value=" + value +
-                    '}';
-        }
-    }
-
-    /*
-    7
-    1 4 2 3
-    2 2 4 5
-    3 6 6 7
-    4 1 -1 -1
-    5 3 -1 -1
-    6 5 -1 -1
-    7 7 -1 -1
-    6
-
-            4
-           / \
-          2   6
-         / \  / \
-        1   3 5  7
-
-        6
-     */
-
-    private static void test() {
-//        Node node1 = new Node(null, null, 1);
-//        Node node2 = new Node(null, null, 3);
-//        Node node3 = new Node(node1, node2, 2);
-//        Node node4 = new Node(null, null, 5);
-//        Node node5 = new Node(null, null, 7);
-//        Node node6 = new Node(node4, node5, 6);
-//        Node node7 = new Node(node3, node6, 4);
-//        System.out.println("node7 = " + node7);
-//        Node newHead = remove(node7, 6);
-//        System.out.println("newHead = " + newHead);
-//        System.out.println("newHead = " + newHead.getRight().value);
-
-//        Node node1 = new Node(null, null, 2);
-//        Node node2 = new Node(node1, null, 3);
-//        Node node3 = new Node(null, node2, 1);
-//        Node node4 = new Node(null, null, 6);
-//        Node node5 = new Node(node4, null, 8);
-//        Node node6 = new Node(node5, null, 10);
-//        Node node7 = new Node(node3, node6, 5);
-//        Node newHead = remove(node7, 10);
-
-        Node node1 = new Node(null, null, 1);
-        Node node2 = new Node(null, null, 3);
-        Node node3 = new Node(node1, node2, 2);
-        Node node4 = new Node(null, null, 5);
-        Node node5 = new Node(null, null, 7);
-        Node node6 = new Node(node4, node5, 6);
-        Node node7 = new Node(node3, node6, 4);
-        Node newHead = remove(node7, 4);
-
-//        Node node1 = new Node(null, null, 7);
-//        Node node2 = new Node(null, node1, 5);
-//        Node node3 = new Node(node2, null, 10);
-//        Node remove = remove(node3, 10);
-
-//        Node node1 = new Node(null, null, 2);
-//        Node node2 = new Node(null, node1, 1);
-//        Node remove = remove(node2, 1);
-    }
-
-    public static void main(String[] args) {
-        test();
     }
 }
