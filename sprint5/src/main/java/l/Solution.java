@@ -5,7 +5,7 @@ public class Solution {
         int lChildIdx = idx * 2;
         int rChildIdx = idx * 2 + 1;
 
-        if (lChildIdx > heap.length) return idx;
+        if (lChildIdx >= heap.length) return idx;
 
         int maxChildIdx;
         if (rChildIdx < heap.length && heap[rChildIdx] > heap[lChildIdx]) {
