@@ -4,10 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-// Passed ID 69379273
+// Passed ID 69424940
 /**
  * -- ПРИНЦИП РАБОТЫ --
  * Входные данные (участников) помещаем в кучу. Для этого помещаем каждый элемент в самый конец кучи и делаем
@@ -62,22 +63,21 @@ public class HeapSort {
         return sortedArray;
     }
 
-    public static int siftUp(List<Participant> heap, int idx) {
-        if (idx <= 1) return 1;
+    public static void siftUp(List<Participant> heap, int idx) {
+        if (idx <= 1) return;
 
         final int parentIdx = idx / 2;
         if (heap.get(idx).compareTo(heap.get(parentIdx)) > 0) {
-            swap(heap, idx, parentIdx);
-            return siftUp(heap, parentIdx);
+            Collections.swap(heap, idx, parentIdx);
+            siftUp(heap, parentIdx);
         }
-        return idx;
     }
 
-    public static int siftDown(List<Participant> heap, int idx) {
+    public static void siftDown(List<Participant> heap, int idx) {
         final int lChildIdx = idx * 2;
         final int rChildIdx = idx * 2 + 1;
 
-        if (lChildIdx >= heap.size()) return idx;
+        if (lChildIdx >= heap.size()) return;
 
         final int maxChildIdx;
         if (rChildIdx < heap.size() && heap.get(rChildIdx).compareTo(heap.get(lChildIdx)) > 0) {
@@ -87,16 +87,9 @@ public class HeapSort {
         }
 
         if (heap.get(idx).compareTo(heap.get(maxChildIdx)) < 0) {
-            swap(heap, idx, maxChildIdx);
-            return siftDown(heap, maxChildIdx);
+            Collections.swap(heap, idx, maxChildIdx);
+            siftDown(heap, maxChildIdx);
         }
-        return idx;
-    }
-
-    private static void swap(List<Participant> heap, int i, int k) {
-        final Participant temp = heap.get(i);
-        heap.set(i, heap.get(k));
-        heap.set(k, temp);
     }
 
     private static class Participant implements Comparable<Participant> {

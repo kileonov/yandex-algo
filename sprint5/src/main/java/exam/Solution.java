@@ -1,6 +1,6 @@
 package exam;
 
-// Passed ID 69372901
+// Passed ID 69425119
 /**
  * -- ПРИНЦИП РАБОТЫ --
  * При удалении элемента из BST возможно 3 варианта:
@@ -22,21 +22,23 @@ package exam;
  *
  * -- ВРЕМЕННАЯ СЛОЖНОСТЬ --
  * Time:
- *  O(logn) - если не нашли такой элемент
- *  O(logn) + O(1) - если найденный элемент - лист
- *  O(logn) + O(1) - если найденный элемент имеет только одного потомка
- *  O(logn) + O(logn) + O(1) - если найденный элемент имеет двух потомков
- *  Итог: O(logn) + O(logn) + O(1) + O(logn) + O(1) + O(logn) + O(logn) + O(1) = O(logn)
+ *  O(h) - если не нашли такой элемент, h - высота дерева
+ *  O(h) + O(1) - если найденный элемент - лист, h - высота дерева
+ *  O(h) + O(1) - если найденный элемент имеет только одного потомка, h - высота дерева
+ *  O(h) + O(h) + O(1) - если найденный элемент имеет двух потомков, h - высота дерева
+ *  Итог: O(h) + O(h) + O(1) + O(h) + O(1) + O(h) + O(h) + O(1) = O(h)
  * Space:
  *  O(n) - сама структура BST для хранения элементов
- *  O(1) - операция удаления, так как мы храним только ссылки на пару элементов
- *  Итог: O(n) + O(1) = O(n)
+ *  O(h) - операция удаления, где h - высота дерева
+ *  Итог: O(n) + O(h) = O(n) + O(h)
  */
 public class Solution {
 
     public static Node remove(Node root, int key) {
         final Relation deleteRelation = findDeleteElWithParent(null, root, key, true);
-        if (deleteRelation.child == null) return root;
+        if (deleteRelation.child == null) {
+            return root;
+        }
 
         if (deleteRelation.child.getLeft() == null && deleteRelation.child.getRight() == null) {
             if (deleteRelation.parent == null) {
@@ -47,35 +49,16 @@ public class Solution {
                 deleteRelation.parent.setRight(null);
             }
         } else if (deleteRelation.child.getLeft() == null) {
-            if (deleteRelation.child == root) {
-                root = deleteRelation.child.getRight();
-            } else if (deleteRelation.isLeft) {
-                deleteRelation.parent.setLeft(deleteRelation.child.getRight());
-            } else {
-                deleteRelation.parent.setRight(deleteRelation.child.getRight());
-            }
+            root = removeNodeRelations(root, deleteRelation, deleteRelation.child.getRight());
         } else if (deleteRelation.child.getRight() == null) {
-            if (deleteRelation.child == root) {
-                root = deleteRelation.child.getLeft();
-            } else if (deleteRelation.isLeft) {
-                deleteRelation.parent.setLeft(deleteRelation.child.getLeft());
-            } else {
-                deleteRelation.parent.setRight(deleteRelation.child.getLeft());
-            }
+            root = removeNodeRelations(root, deleteRelation, deleteRelation.child.getLeft());
         } else {
             final Relation replaceRelation = findReplacedElWithParent(deleteRelation.child, deleteRelation.child.getRight());
             if (replaceRelation.parent != deleteRelation.child) {
                 replaceRelation.parent.setLeft(replaceRelation.child.getRight());
                 replaceRelation.child.setRight(null);
             }
-
-            if (deleteRelation.child == root) {
-                root = replaceRelation.child;
-            } else if (deleteRelation.isLeft) {
-                deleteRelation.parent.setLeft(replaceRelation.child);
-            } else {
-                deleteRelation.parent.setRight(replaceRelation.child);
-            }
+            root = removeNodeRelations(root, deleteRelation, replaceRelation.child);
 
             if (replaceRelation.child != deleteRelation.child.getLeft()) {
                 replaceRelation.child.setLeft(deleteRelation.child.getLeft());
@@ -91,8 +74,21 @@ public class Solution {
         return root;
     }
 
+    private static Node removeNodeRelations(Node root, Relation nodeToDelete, Node child) {
+        if (nodeToDelete.child == root) {
+            root = child;
+        } else if (nodeToDelete.isLeft) {
+            nodeToDelete.parent.setLeft(child);
+        } else {
+            nodeToDelete.parent.setRight(child);
+        }
+        return root;
+    }
+
     public static Relation findDeleteElWithParent(Node parent, Node child, int key, boolean isLeft) {
-        if (child == null) return new Relation(parent, null, isLeft);
+        if (child == null) {
+            return new Relation(parent, null, isLeft);
+        }
 
         if (child.getValue() == key) {
             return new Relation(parent, child, isLeft);
@@ -104,9 +100,13 @@ public class Solution {
     }
 
     public static Relation findReplacedElWithParent(Node parent, Node child) {
-        if (child == null) return new Relation(parent, null);
+        if (child == null) {
+            return new Relation(parent, null);
+        }
 
-        if (child.getLeft() == null) return new Relation(parent, child);
+        if (child.getLeft() == null) {
+            return new Relation(parent, child);
+        }
 
         return findReplacedElWithParent(child, child.getLeft());
     }
