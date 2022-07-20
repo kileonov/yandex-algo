@@ -3,92 +3,99 @@ package exam;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Railways {
 
-    private enum Color {
-        WHITE, GRAY, BLACK
-    }
+    private static final char ROAD_B = 'B';
+    private static final int WHITE = 0;
+    private static final int GRAY = 1;
+    private static final int BLACK = 2;
 
     private static class Railway {
-        List<List<Integer>> adjacentList;
-        List<Color> colors;
+        List<List<Integer>> cityAdjacentList;
 
-        public Railway(List<List<Integer>> adjacentList) {
-            this.adjacentList = adjacentList;
-
-            colors = new ArrayList<>(adjacentList.size());
-            for (int i = 0; i < adjacentList.size(); i++) {
-                colors.add(Color.WHITE);
+        public Railway(int n) {
+            cityAdjacentList = new ArrayList<>(n + 1);
+            for (int i = 0; i <= n; i++) {
+                cityAdjacentList.add(new LinkedList<>());
             }
+        }
+
+        public int getNumOfCities() {
+            return cityAdjacentList.size();
+        }
+
+        public void addRoad(int from, int to) {
+            cityAdjacentList.get(from).add(to);
         }
     }
 
-    public static void graphDFS(Railway railway) {
-        System.out.println(dfs(railway, 1) ? "YES" : "NO");
-    }
+    public static boolean hasCycledCity(Railway railway) {
+        final int numOfCities = railway.getNumOfCities();
+        final List<Integer> colors = new ArrayList<>(numOfCities);
+        for (int i = 0; i < numOfCities; i++) {
+            colors.add(WHITE);
+        }
 
-    public static boolean dfs(Railway railway, int s) {
-        Stack<Integer> stack = new Stack<>();
-        stack.push(s);
-
-        while (!stack.isEmpty()) {
-            Integer city = stack.pop();
-            final Color edgeColor = railway.colors.get(city);
-            if (edgeColor == Color.WHITE) {
-                railway.colors.set(city, Color.GRAY);
-                stack.push(city);
-
-                for (Integer neighbourCity : railway.adjacentList.get(city)) {
-                    Color neighbourColor = railway.colors.get(neighbourCity);
-                    if (neighbourColor == Color.WHITE) {
-                        stack.push(neighbourCity);
-                    } else if (neighbourColor ==  Color.GRAY) {
-                        return false;
-                    }
+        for (int i = 1; i < numOfCities; i++) {
+            if (colors.get(i) == WHITE) {
+                if (dfs(railway.cityAdjacentList, colors, i)) {
+                    return true;
                 }
-            } else if (edgeColor == Color.GRAY) {
-                railway.colors.set(city, Color.BLACK);
             }
         }
 
-        return true;
+        return false;
+    }
+
+    public static boolean dfs(List<List<Integer>> cityAdjacentList, List<Integer> colors, int s) {
+        colors.set(s, GRAY);
+
+        for (Integer neighbourCity : cityAdjacentList.get(s)) {
+            if (colors.get(neighbourCity) == GRAY) {
+                return true;
+            }
+
+            if (colors.get(neighbourCity) == WHITE && dfs(cityAdjacentList, colors, neighbourCity)) {
+                return true;
+            }
+        }
+
+        colors.set(s, BLACK);
+        return false;
     }
 
     public static void main(String[] args) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-            int n = Integer.parseInt(reader.readLine());
+        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+            final int n = Integer.parseInt(reader.readLine());
 
-            Railway railway = readAdjacentList(reader, n);
+            final Railway railway = readAdjacentList(reader, n);
 
-            graphDFS(railway);
+            final boolean result = hasCycledCity(railway);
+            System.out.println(result ? "NO" : "YES");
         }
     }
 
     public static Railway readAdjacentList(BufferedReader reader, int n) throws IOException {
-        List<List<Integer>> adjacentList = new ArrayList<>(n + 1);
-        for (int i = 0; i <= n; i++) {
-            adjacentList.add(new LinkedList<>());
-        }
+        final Railway railway = new Railway(n);
 
         for (int i = 0; i < n - 1; i++) {
-            String roads = reader.readLine();
-            int from = i + 1;
-            char[] chars = roads.toCharArray();
+            final String roads = reader.readLine();
+            final int from = i + 1;
+            final char[] chars = roads.toCharArray();
             for (int j = 0; j < chars.length; j++) {
-                int to = from + j + 1;
+                final int to = from + j + 1;
                 if (roads.charAt(j) == ROAD_B) {
-                    adjacentList.get(from).add(to);
+                    railway.addRoad(from, to);
                 } else {
-                    adjacentList.get(to).add(from);
+                    railway.addRoad(to, from);
                 }
             }
         }
 
-        return new Railway(adjacentList);
+        return railway;
     }
-
-    private static final char ROAD_B = 'B';
-    private static final char ROAD_R = 'R';
 }
