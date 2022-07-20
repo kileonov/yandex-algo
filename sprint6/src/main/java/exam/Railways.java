@@ -3,9 +3,7 @@ package exam;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Railways {
 
@@ -20,7 +18,7 @@ public class Railways {
         public Railway(int n) {
             cityAdjacentList = new ArrayList<>(n + 1);
             for (int i = 0; i <= n; i++) {
-                cityAdjacentList.add(new LinkedList<>());
+                cityAdjacentList.add(new ArrayList<>());
             }
         }
 
@@ -35,13 +33,13 @@ public class Railways {
 
     public static boolean hasCycledCity(Railway railway) {
         final int numOfCities = railway.getNumOfCities();
-        final List<Integer> colors = new ArrayList<>(numOfCities);
+        final int[] colors = new int[numOfCities];
         for (int i = 0; i < numOfCities; i++) {
-            colors.add(WHITE);
+            colors[i] = WHITE;
         }
 
         for (int i = 1; i < numOfCities; i++) {
-            if (colors.get(i) == WHITE) {
+            if (colors[i] == WHITE) {
                 if (dfs(railway.cityAdjacentList, colors, i)) {
                     return true;
                 }
@@ -51,20 +49,33 @@ public class Railways {
         return false;
     }
 
-    public static boolean dfs(List<List<Integer>> cityAdjacentList, List<Integer> colors, int s) {
-        colors.set(s, GRAY);
+    public static boolean dfs(List<List<Integer>> cityAdjacentList, int[] colors, int s) {
+        final LinkedList<Integer> stack = new LinkedList<>();
+        stack.add(s);
 
-        for (Integer neighbourCity : cityAdjacentList.get(s)) {
-            if (colors.get(neighbourCity) == GRAY) {
-                return true;
-            }
+        while (!stack.isEmpty()) {
+            final Integer city = stack.removeLast();
+            final int edgeColor = colors[city];
+            if (edgeColor == WHITE) {
+                colors[city] = GRAY;
+                stack.add(city);
 
-            if (colors.get(neighbourCity) == WHITE && dfs(cityAdjacentList, colors, neighbourCity)) {
-                return true;
+                for (Integer neighbourCity : cityAdjacentList.get(city)) {
+                    final int neighbourColor = colors[neighbourCity];
+
+                    if (neighbourColor ==  GRAY) {
+                        return true;
+                    }
+
+                    if (neighbourColor == WHITE) {
+                        stack.add(neighbourCity);
+                    }
+                }
+            } else if (edgeColor == GRAY) {
+                colors[city] = BLACK;
             }
         }
 
-        colors.set(s, BLACK);
         return false;
     }
 
@@ -85,8 +96,7 @@ public class Railways {
         for (int i = 0; i < n - 1; i++) {
             final String roads = reader.readLine();
             final int from = i + 1;
-            final char[] chars = roads.toCharArray();
-            for (int j = 0; j < chars.length; j++) {
+            for (int j = 0; j < roads.length(); j++) {
                 final int to = from + j + 1;
                 if (roads.charAt(j) == ROAD_B) {
                     railway.addRoad(from, to);
