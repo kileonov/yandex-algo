@@ -5,6 +5,31 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
+// Passed ID 69432880
+/**
+ * -- ПРИНЦИП РАБОТЫ --
+ * Алгоритм может начать с любой вершины, поэтому берем первую попавшуюся. Из ребер соединяющих данную вершину с
+ * другими, нужно выбрать с максимальным значением бюджета. Это ребро, будет именно тем ребром, которое входит
+ * в максимальное остовное дерево. Помечаем эту вершину как посещенную, добавляем ребра (которые не соединяют
+ * уже пройденные вершины) в массив ребер для прохода. Повторяем алгоритм до тех пор, пока либо массив ребер не станет
+ * пустым или не обойдем все вершины.
+ *
+ * -- ДОКАЗАТЕЛЬСТВО КОРРЕКТНОСТИ --
+ * На каждом шаге пометки вершины как пройденной, выборки макс ребра уменьшается количество обрабатываем
+ * вершин в изначальном графе (или остается неизменным если он несвязной). При этом мы точно находим макс ребро,
+ * входящее в макс остовное дерево.
+ *
+ * -- ВРЕМЕННАЯ СЛОЖНОСТЬ --
+ * Time |e| - кол-во ребер, |v| - кол-во вершин:
+ *  O(log|v|) - достать элемент из кучи для вершины. При этом это нужно сделать |e| раз.
+ *  Итог: O(|e|log|v|)
+ * Space:
+ *  O(|v|) - массив для макс остовного графа
+ *  O(|e|) - массив для посещенных вершин
+ *  O(|e|) - массив для не посещенных вершин
+ *  O(|e||v|) - список смежностей
+ *  Итог: O(|v|) + O(|e|) + O(|e|) + O(|e||v|) = O(|e||v|)
+ */
 public class ExpensiveNetwork {
 
     private static class MaxSpinningTree {
@@ -99,7 +124,7 @@ public class ExpensiveNetwork {
     }
 
     private static class Heap {
-        private List<MaxSpinningTree.Edge> data;
+        private final List<MaxSpinningTree.Edge> data;
 
         public Heap(int size) {
             this.data = new ArrayList<>(size + 1);
@@ -167,7 +192,7 @@ public class ExpensiveNetwork {
     }
 
     public static MaxSpinningTree readEdges(BufferedReader reader, int n, int m) throws IOException {
-        Map<Integer, List<MaxSpinningTree.Edge>> adjacentList = new HashMap<>(2 * n);
+        final Map<Integer, List<MaxSpinningTree.Edge>> adjacentList = new HashMap<>(2 * n);
         for (int i = 1; i <= n; i++) {
             adjacentList.put(i, new LinkedList<>());
         }
