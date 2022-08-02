@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-// Passed ID 69432880
+// Passed ID 69565263
 /**
  * -- ПРИНЦИП РАБОТЫ --
  * Алгоритм может начать с любой вершины, поэтому берем первую попавшуюся. Из ребер соединяющих данную вершину с
@@ -27,8 +27,8 @@ import java.util.*;
  *  O(|v|) - массив для макс остовного графа
  *  O(|e|) - массив для посещенных вершин
  *  O(|e|) - массив для не посещенных вершин
- *  O(|e||v|) - список смежностей
- *  Итог: O(|v|) + O(|e|) + O(|e|) + O(|e||v|) = O(|e||v|)
+ *  O(|e| + |v|) - список смежностей
+ *  Итог: O(|v|) + O(|e|) + O(|e|) + O(|e| + |v|) = O(|e| + |v|) + O(|v|) + O(|e|)
  */
 public class ExpensiveNetwork {
 
@@ -65,8 +65,12 @@ public class ExpensiveNetwork {
 
             @Override
             public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
+                if (this == o) {
+                    return true;
+                }
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
                 final Edge edge = (Edge) o;
                 return from == edge.from && to == edge.to && weight == edge.weight;
             }
@@ -150,7 +154,9 @@ public class ExpensiveNetwork {
         }
 
         public static void siftUp(List<MaxSpinningTree.Edge> heap, int idx) {
-            if (idx <= 1) return;
+            if (idx <= 1) {
+                return;
+            }
 
             final int parentIdx = idx / 2;
             if (heap.get(idx).compareTo(heap.get(parentIdx)) > 0) {
@@ -163,7 +169,9 @@ public class ExpensiveNetwork {
             final int lChildIdx = idx * 2;
             final int rChildIdx = idx * 2 + 1;
 
-            if (lChildIdx >= heap.size()) return;
+            if (lChildIdx >= heap.size()) {
+                return;
+            }
 
             final int maxChildIdx;
             if (rChildIdx < heap.size() && heap.get(rChildIdx).compareTo(heap.get(lChildIdx)) > 0) {
@@ -198,22 +206,11 @@ public class ExpensiveNetwork {
         }
 
         for (int i = 0; i < m; i++) {
-            final String line = reader.readLine();
-            int from = -1;
-            int to = -1;
-            final int weight;
-            int currentNum = 0;
-            for (int j = 0; j < line.length(); j++) {
-                char c = line.charAt(j);
-                if (c != ' ') {
-                    currentNum = 10 * currentNum + Character.getNumericValue(c);
-                } else {
-                    if (from == -1) from = currentNum;
-                    else if (to == -1) to = currentNum;
-                    currentNum = 0;
-                }
-            }
-            weight = currentNum;
+            // поправил, раньше просто не проходило по времени/пространству, поэтому с первых спринтов ctrl c + ctrl v
+            final StringTokenizer tokens = new StringTokenizer(reader.readLine());
+            final int from = Integer.parseInt(tokens.nextToken());
+            final int to = Integer.parseInt(tokens.nextToken());
+            final int weight = Integer.parseInt(tokens.nextToken());
 
             adjacentList.get(from).add(new MaxSpinningTree.Edge(from, to, weight));
             adjacentList.get(to).add(new MaxSpinningTree.Edge(to, from, weight));

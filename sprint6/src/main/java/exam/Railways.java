@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-// Passed ID 69443747
+// Passed ID 69565236
 /**
  * -- ПРИНЦИП РАБОТЫ --
  * Движение идет к столице, при этом граф ориентированный и у нас есть всего 2 значения дорог.
@@ -22,11 +22,10 @@ import java.util.*;
  * -- ВРЕМЕННАЯ СЛОЖНОСТЬ --
  * Time |e| - кол-во ребер, |v| - кол-во вершин:
  *  O(|e| + |v|) - dfs
- *  Итог: O(|e|log|v|)
  * Space:
- *  O(|e||v|) - список смежностей городов
+ *  O(|e| + |v|) - список смежностей городов
  *  O(|v|) - массив цветов для городов
- *  Итог: O(|e||v|) + O(|v|) = O(|e||v|)
+ *  Итог: O(|e| + |v|) + O(|v|)
  */
 public class Railways {
 
@@ -62,10 +61,8 @@ public class Railways {
         }
 
         for (int i = 1; i < numOfCities; i++) {
-            if (colors[i] == WHITE) {
-                if (dfs(railway.cityAdjacentList, colors, i)) {
-                    return true;
-                }
+            if (colors[i] == WHITE && dfs(railway.cityAdjacentList, colors, i)) {
+                return true;
             }
         }
 
