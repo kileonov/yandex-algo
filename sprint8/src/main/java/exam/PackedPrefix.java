@@ -3,9 +3,10 @@ package exam;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
-// Passed ID 69658343
+// Passed ID 69672255
 /**
  * -- ПРИНЦИП РАБОТЫ --
  * Нужно распаковать строку:
@@ -39,28 +40,28 @@ import java.util.Stack;
 public class PackedPrefix {
 
     private static String unzip(String line) {
-        final Stack<StringBuilder> strs = new Stack<>();
-        final Stack<Integer> operands = new Stack<>();
+        final Deque<StringBuilder> strs = new ArrayDeque<>();
+        final Deque<Integer> operands = new ArrayDeque<>();
         final StringBuilder result = new StringBuilder();
 
         for (int i = 0; i < line.length(); i++) {
             final char ch = line.charAt(i);
 
             if (Character.isDigit(ch)) {
-                operands.push(Character.getNumericValue(ch));
+                operands.addLast(Character.getNumericValue(ch));
             } else if (ch == '[') {
-                strs.push(new StringBuilder());
+                strs.addLast(new StringBuilder());
             } else if (ch == ']') {
                 if (strs.size() == 1) {
-                    result.append(String.valueOf(strs.pop()).repeat(operands.pop()));
+                    result.append(String.valueOf(strs.pollLast()).repeat(operands.pollLast()));
                 } else {
-                    final StringBuilder current = strs.pop();
-                    strs.push(strs.pop().append(String.valueOf(current).repeat(operands.pop())));
+                    final StringBuilder current = strs.pollLast();
+                    strs.addLast(strs.pollLast().append(String.valueOf(current).repeat(operands.pollLast())));
                 }
             } else if (strs.isEmpty()) {
                 result.append(ch);
             } else {
-                strs.push(strs.pop().append(ch));
+                strs.addLast(strs.pollLast().append(ch));
             }
         }
 
